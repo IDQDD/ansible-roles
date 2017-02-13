@@ -1,0 +1,57 @@
+---
+# this playbook uses dynamic inventory thus it must have been running with -i nxos_acl2json.py option
+- name: Manage Nexuses ACLs
+  hosts: n9k
+  gather_facts: no
+  vars:
+    ansible_connection: local
+    username: ansible
+    password: cisco
+
+# vars comes to ansible-play dynamicly by executing the script nxos_acl2json.py 
+# the vars format has a complex dict(list(dict)) structure
+# it could be much easier but ansible is not flexible enough with ways it can iterate through nested data
+# so finally I came up with such a structure 
+#
+# acl: 
+#    - aclname: "aclname1"
+#      ace: 
+#        - {"src": "any", "seq": "10", "dest": "any", "proto": "udp", "state": "present"},
+#        - {"state": "absent", "seq": "35"}
+#    - aclname: "aclname2"
+#      ace:
+#        - {"src": "any", "log": "enable", "seq": "192", "dest": "any", "proto": "tcp", "state": "present"}
+
+  tasks:
+      # make sure variables were being loaded correctly
+    - debug: var=item.1.seq
+      with_subelements:
+        - "{{ acl }}"
+        - ace
+      tags: debug
+
+    # push acls up on nexuses
+    - name: pullup acls
+      nxos_acl:
+        name: "{{ item.0.aclname}}"
+        state: "{{ item.1.state }}"
+        seq: "{{ item.1.seq }}"
+        action: "{{ item.1.action | default(omit) }}"
+        proto: "{{ item.1.proto | default(omit) }}"
+        src: "{{ item.1.src | default(omit) }}"
+        src_port_op: "{{ item.1.src_port_op | default(omit) }}"
+        src_port1: "{{ item.1.src_port1 | default(omit) }}"
+        src_port2: "{{ item.1.src_port2 | default(omit) }}"
+        dest: "{{ item.1.dest | default(omit) }}"
+        dest_port_op: "{{ item.1.dest_port_op | default(omit) }}"
+        dest_port1: "{{ item.1.dest_port1 | default(omit) }}"
+        dest_port2: "{{ item.1.dest_port2 | default(omit) }}"
+        log: "{{ item.1.log | default(omit) }}"
+        host: "{{ inventory_hostname }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+        transport: nxapi
+      with_subelements:
+        - "{{ acl }}"
+        - ace
+tags: acl
