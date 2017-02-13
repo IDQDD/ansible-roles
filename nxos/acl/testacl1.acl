@@ -1,0 +1,11 @@
+10 deny udp any ra 500 600 any ra 700 800
+20 permit udp any ra 111 222 any eq 333
+30 permit tcp any ra 1921 202 any log
+no 35
+30 permit tcp any ra 1921 202 any
+40 permit tcp any eq 303 any ra 300 400 log
+50 permit tcp any eq 505 any eq 500
+60 permit udp any any eq ntp log
+70 permit tcp 192.1.60.0/24 eq 19224 192.1.2.111/32 log
+80 permit tcp 192.1.60.0/24 192.1.2.231/32
+100 deny ip any any log
