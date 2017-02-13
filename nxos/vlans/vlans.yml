@@ -1,0 +1,23 @@
+---
+
+vlans:
+  - id: 1
+    name: default
+  - id: 2
+    name: AS44915
+  - id: 301
+    name: INTERLINK
+  - id: 320
+    name: SERVERS
+  - id: 324
+    name: BACKUP
+  - id: 330
+    name: iLo
+  - id: 333
+    name: WORKSTATIONS
+  - id: 340
+    name: VM_KERNEL
+  - id: 341
+    name: VMOTION
+  - id: 399
+    name: MGNMT
