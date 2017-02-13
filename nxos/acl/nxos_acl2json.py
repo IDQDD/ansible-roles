@@ -102,32 +102,37 @@ def ParseACL(data):
                 rlist.append(dtmp)
                 continue
             else:
-                print "incorrect sequense number of ACE %s" % acelist[1]
+                print "incorrect sequense number of ACE: {0}".format(str(acelist[1]))
                 exit(1)
 
-    # first 4 terms are predetermined so we just need to validate them
+    # first 4 fields are predetermined so we just need to validate them
         if acelist[0].isdigit():
             dtmp['seq'] = acelist[0]
         else:
-            print "incorrect sequense number of ACE %s" % acelist[1]
+            print "incorrect sequense number of ACE: {0}".format(str(acelist[1]))
             exit(1)
 
         if acelist[1] in ('permit', 'deny'):
             dtmp[acl_skel[1]] = acelist[1]
+        elif acelist[1] == "remark":
+            dtmp[acl_skel[1]] = acelist[1]
+            dtmp["remark"] = " ".join(acelist[2:])
+            rlist.append(dtmp)
+            continue
         else:
-            print "action can be either 'permit' or 'deny"
+            print "action can be 'permit', 'deny" or "remark"
             exit(1)
 
         if acelist[2] in ('ip', 'tcp', 'udp', 'icmp', 'gre', 'ah', 'esp'):
             dtmp[acl_skel[2]] = acelist[2]
         else:
-            print "unknown protocol: %s" % acelist[2]
+            print "unknown protocol: {0}".format(str(acelist[2]))
             exit(1)
 
         if isValidPrefix(acelist[3]):
             dtmp[acl_skel[3]] = acelist[3]
 
-    # lookup and validate the remaining 4 to 11 ACE words (don't even try to understand. It's magic here)
+    # lookup and validate the remaining (don't even try to understand. It's magic here)
         i, k = 4, 0
         while i< len(acelist):
             val = acelist[i]
@@ -152,15 +157,17 @@ def ParseACL(data):
                 if i == 4: k = 3  # skip src ports
                 dtmp[acl_skel[i + k]] = isValidPrefix(val)
 
+
+
             i += 1  # iterate over acelist
 
-#        print json.dumps(dtmp, indent=4, sort_keys=True)
+        #print json.dumps(dtmp, indent=4, sort_keys=True)
         rlist.append(dtmp)
 
     return rlist
 
-
 def get_inventory():
+
     fileglob = glob('./acl/*.acl')
     inventory = {}
     group = {}
@@ -211,7 +218,8 @@ def main():
     else:
         inventory = empty_inventory()
 
-    print json.dumps(inventory)
+    print json.dumps(inventory, indent=4, sort_keys=True)
+    #print json.dumps(inventory)
 
 
 if __name__ == '__main__':
