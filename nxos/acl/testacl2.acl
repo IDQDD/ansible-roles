@@ -1,0 +1,4 @@
+40 permit tcp any eq 303 any ra 300 400 log
+51 permit tcp any eq 505 any eq 500
+60 permit udp any any eq ntp log
+81 deny ip any any
