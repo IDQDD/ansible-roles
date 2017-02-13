@@ -1,0 +1,123 @@
+---
+- name: Manage VPC's
+  hosts: n9k
+  vars_files:
+    -  ./vpc-var-test.yml
+
+  tasks:
+
+# take a look at the complex variable
+    - debug: var=item
+      with_subelements: 
+        - "{{ vpc }}"
+        - int
+      tags: debug
+
+# create or delete a port-channell interface
+    - name: create or remove portchannels
+      nxos_portchannel:
+        group: "{{ item.group }}"
+        members: "{{ item.int }}"
+        mode: "{{ item.lacp | default('passive') }}"
+        state: "{{ item.state | default('present') }}" 
+        host: "{{ inventory_hostname }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+        transport: nxapi
+      with_items: "{{ vpc }}"
+      tags: po
+
+# if a port-channel has been removed in the previous task then default physical interfaces
+    - name: default interfaces
+      nxos_interface:
+        interface: "{{ item.1 }}"
+        state: default
+        host: "{{ inventory_hostname }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+        transport: nxapi
+      when: item.0.state is defined and item.0.state == 'absent'
+      with_subelements:
+        - "{{ vpc }}"
+        - int
+      tags: default
+
+# set physical interface's description
+    - name: set interfaces descriptions
+      nxos_interface: 
+        interface: "{{ item.1 }}"
+        description: "{{ item.0.description }} (Po{{ item.0.group }} member)"
+        host: "{{ inventory_hostname }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+        transport: nxapi
+      when: 
+        - item.0.description is defined
+        - item.0.state is not defined or item.0.state != 'absent'
+      with_subelements: 
+        - "{{ vpc }}"
+        - int
+      tags: desc
+
+# set Port-channel interface's description
+    - name: set Po interfaces descriptions
+      nxos_interface: 
+        interface: "port-channel{{ item.group }}"
+        description: "{{ item.description }}"
+        host: "{{ inventory_hostname }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+        transport: nxapi
+      when: 
+        - item.description is defined
+        - item.state is not defined or item.state != 'absent'
+      with_items: "{{ vpc }}"
+      tags: podesc
+
+# set swichport parameters for access interfaces
+# po will inherit its settings onto physical ifs
+    - name: set switchport ACCESS parameters
+      nxos_switchport: 
+        interface: "Po{{ item.group }}"
+        mode: access 
+        access_vlan: "{{ item.access_vlan | default(1) }}" 
+        host: "{{ inventory_hostname }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+        transport: nxapi
+      when: 
+        - item.mode == "access"
+        - item.state is not defined or item.state != 'absent'
+      with_items: "{{ vpc }}"
+      tags: access
+
+# ensure or set swichport parameters for trunk interfaces
+# po will inherit its settings onto physical ifs
+    - name: ensure or set switchport TRUNK parameters
+      nxos_switchport: 
+        interface: "Po{{ item.group }}"
+        mode: trunk
+        trunk_allowed_vlans: "{{ item.trunk_vlans | default () }}" 
+        native_vlan: "{{ item.native_vlan | default(1) }}"
+        host: "{{ inventory_hostname }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+        transport: nxapi
+      when: 
+        - item.mode == "trunk"
+        - item.state is not defined or item.state != 'absent'
+      with_items: "{{ vpc }}"
+      tags: trunk 
+
+# Link Po to VPC
+    - name: link portchannels to vpc
+      nxos_vpc_interface:
+        portchannel: "{{ item.group }}"
+        vpc: "{{ item.group }}"
+        host: "{{ inventory_hostname }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+        transport: nxapi
+      with_items: "{{ vpc }}"
+      when: item.state is not defined or item.state != 'absent'
+      tags: vpc
