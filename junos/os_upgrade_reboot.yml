@@ -1,0 +1,28 @@
+---
+- name: Upgrade JunOS with Ansible
+  hosts: ex2200-R15,srx-12.3X48
+  connection: local
+  gather_facts: no
+
+  vars:
+    wait_time: 1200
+    validate_time: 7200
+
+  tasks: 
+    - name: Verifying NETCONF
+      wait_for: host={{ inventory_hostname }} port=830
+
+    - name: Install Junos OS package
+      junos_package:
+        src: "{{ pkg_dir }}/{{ OS_package }}"
+        version: "{{ OS_version }}"     
+        host: "{{ inventory_hostname }}"
+        force: false
+        no_copy: false
+        reboot: "{{ reboot | default('true') }}"
+        username: nryzhkov
+      register: result
+
+    - name: wait until a device have been rebooted
+      wait_for: host={{ inventory_hostname }} port=830 timeout={{ wait_time }} delay=300
+      when: result.changed
