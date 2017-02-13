@@ -1,5 +1,5 @@
 ---
-# this playbook uses dynamic inventory thus it must have been running with -i nxos_acl2json.py option
+# this playbook uses dynamic inventory thus it must have been running with -i ./acl/nxos_acl2json.py option
 - name: Manage Nexuses ACLs
   hosts: n9k
   gather_facts: no
