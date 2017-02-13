@@ -141,6 +141,10 @@ def ParseACL(data):
             if val == "log":  # if log(11)
                 dtmp["log"] = 'enable'
                 break  # break while loop
+                        
+            if val == "established":
+                dtmp["established"] = 'enable'
+                break  # break while loop
 
             elif val in ("eq", "gt", "lt", "noq"):
                 dtmp[acl_skel[i + k]] = val  # dst_port_op(8)
