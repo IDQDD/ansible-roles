@@ -93,8 +93,9 @@ def ParseACL(data):
         dtmp=dict()
         dtmp["state"] = "present"
         acelist = ace.split()
+        if not acelist: continue
 
-    # check if ace should be deleted 'no'
+        # check if ace should be deleted 'no'
         if acelist[0] ==  "no":
             if acelist[1].isdigit():
                 dtmp['seq'] = acelist[1]
@@ -105,7 +106,7 @@ def ParseACL(data):
                 print "incorrect sequense number of ACE: {0}".format(str(acelist[1]))
                 exit(1)
 
-    # first 4 fields are predetermined so we just need to validate them
+        # first 4 fields are predetermined so we just need to validate them
         if acelist[0].isdigit():
             dtmp['seq'] = acelist[0]
         else:
@@ -132,7 +133,7 @@ def ParseACL(data):
         if isValidPrefix(acelist[3]):
             dtmp[acl_skel[3]] = acelist[3]
 
-    # lookup and validate the remaining (don't even try to understand. It's magic here)
+        # lookup and validate the remaining (don't even try to understand. It's magic here)
         i, k = 4, 0
         while i< len(acelist):
             val = acelist[i]
