@@ -1,0 +1,22 @@
+---
+
+# if you want this module to be running then the backitup variable should be defined
+# this can be done by cli option -e:
+# idqdd@idqdd:~/ansible/ex$ ansible-playbook os_upgrade_copy_slice.yml -v -e backitup=yes
+
+- name: Copy primary partiton to a backup after the JunOS upgrade
+  hosts: ex2200-R15,srx-12.3X48
+  connection: local
+  gather_facts: no
+
+  tasks: 
+    - name: Verifying NETCONF
+      wait_for: host={{ inventory_hostname }} port=830
+
+    - debug: var=backitup
+
+    - name: copy new OS to a backup partition
+      junos_command:
+        commands: "request system snapshot slice alternate"
+        host: "{{ inventory_hostname }}"
+      when: backitup is defined
