@@ -47,6 +47,8 @@
         dest_port1: "{{ item.1.dest_port1 | default(omit) }}"
         dest_port2: "{{ item.1.dest_port2 | default(omit) }}"
         log: "{{ item.1.log | default(omit) }}"
+        remark: "{{ item.1.remark | default(omit) }}"
+        established: "{{ item.1.established | default(omit) }}"
         host: "{{ inventory_hostname }}"
         username: "{{ username }}"
         password: "{{ password }}"
