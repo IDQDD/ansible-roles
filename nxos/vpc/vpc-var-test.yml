@@ -1,0 +1,28 @@
+---
+
+vpc:
+  - group: 25
+    description: "test po25"
+    lacp: passive
+    int:  
+     - Eth1/25
+    mode: access
+    access_vlan: 320
+    state: absent
+
+  - group: 110 
+    description: "test po110"
+    lacp: active
+    int: 
+     - Eth101/1/10
+    mode: trunk
+    trunk_vlans: 320,324,340,341
+    native_vlan: 399
+    state: absent
+
+  - group: 111 
+    int: 
+     - Eth101/1/11
+     - Eth101/1/12
+    mode: trunk
+    state: absent
