@@ -1,0 +1,36 @@
+# EX switches with OS version 12.3R11.2
+[ex2200-R12]
+ex2200-207
+
+# EX switches with OS version 15.1R5.5
+[ex2200-R15]
+ex2200-201 
+
+# SRXes with OS version 12.1X46-D40.2
+[srx-12.1X46]
+
+# SRXes with OS version 12.3X48-D40.5
+[srx-12.3X48]
+srx-vpn1
+srx-vpn2
+
+#global vars
+[all:vars]
+pkg_dir=/var/tmp/junos-install
+
+#vars for each groups 
+[ex2200-R12:vars]
+OS_package=jinstall-ex-2200-12.3R11.2-domestic-signed.tgz
+OS_version=12.3R11.2
+
+[ex2200-R15:vars]
+OS_package=jinstall-ex-2200-15.1R5.5-domestic-signed.tgz
+OS_version=15.1R5.5
+
+[srx-12.1X46:vars]
+OS_package=junos-srxsme-12.1X46-D40.2-domestic.tgz
+OS_version=12.1X46-D40.2
+
+[srx-12.3X48:vars]
+OS_package=junos-srxsme-12.3X48-D40.5-domestic.tgz
+OS_version=12.3X48-D40.5
