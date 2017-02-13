@@ -1,0 +1,8 @@
+[n9k]
+n9k1 
+n9k2
+
+[n9k:vars]
+ansible_connection=local
+username=ansible
+password=cisco
