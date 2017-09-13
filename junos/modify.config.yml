@@ -1,0 +1,35 @@
+---
+# {{ configfile }} variable has to be defined by one of the two ways:
+# 1. inventory file (eg hosts or host_vars)
+# 2. as an external variable via cli (option -e):
+# ansible-playbook modify.config.yml -e configfile=change-tunnel-endpoint.set
+
+- name: Modify configuration on Junos Devices
+  hosts: jun-dev-to-config
+  connection: local
+  gather_facts: no
+
+  vars:
+    netconf:
+      host: "{{ inventory_hostname }}"
+      ssh_keyfile: "{{ ssh_key_file }}"
+      username: "{{ ansible_ssh_user }}"
+      transport: netconf
+      timeout: 300
+    cli:
+      host: "{{ inventory_hostname }}"
+      ssh_keyfile: "{{ ssh_key_file }}"
+      username: "{{ ansible_ssh_user }}"
+      port: 22
+      transport: cli
+      timeout: 300
+  
+  tasks: 
+    - name: Verifying NETCONF
+      wait_for: host={{ inventory_hostname }} port=830
+
+    - name: set new configuration
+      junos_config:
+        src: "{{ configfile }}"
+        comment: changed by ansible
+        provider: "{{ netconf }}"
