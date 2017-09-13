@@ -14,9 +14,15 @@ ex2200-201
 srx-vpn1
 srx-vpn2
 
+# srxes to modify configuration in 
+[jun-dev-to-config]
+srx-saratov
+
 #global vars
 [all:vars]
 pkg_dir=/var/tmp/junos-install
+ansible_ssh_user=iddqd
+ssh_key_file=/home/iddqd/.ssh/id_rsa.pub
 
 #vars for each groups 
 [ex2200-R12:vars]
