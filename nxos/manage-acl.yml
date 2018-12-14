@@ -1,5 +1,5 @@
 ---
-# this playbook uses dynamic inventory thus it must have been running with -i ./acl/nxos_acl2json.py option
+# this playbook uses dynamic inventory thus it has to be run with -i ./acl/nxos_acl2json.py option
 - name: Manage Nexuses ACLs
   hosts: n9k
   gather_facts: no
@@ -8,10 +8,8 @@
     username: ansible
     password: cisco
 
-# vars comes to ansible-play dynamicly by executing the script nxos_acl2json.py 
-# the vars format has a complex dict(list(dict)) structure
-# it could be much easier but ansible is not flexible enough with ways it can iterate through nested data
-# so finally I came up with such a structure 
+# vars comes to the ansible-play dynamically (nxos_acl2json.py script)
+# with the follwing data structure 
 #
 # acl: 
 #    - aclname: "aclname1"
